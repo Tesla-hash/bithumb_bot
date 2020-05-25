@@ -1,8 +1,9 @@
 import requests
 from config.config import *
 from dbconnect.config import *
+from api.BithumbGlobal import *
 
-mycursor = mydb.cursor()
+mycursor = mydb.cursor(buffered=True)
 
 def get_bithump_price():
 
@@ -32,9 +33,12 @@ def get_username(message):
 def user_exist(chat_id):
     mycursor.execute("SELECT chat_id FROM users LIMIT 1")
     result = mycursor.fetchone()
+    mycursor.close()
     if result == None:
         return False
+
     else:
+        mycursor.close()
         return True
 
 
@@ -52,12 +56,14 @@ def put_user(chat_id, name):
     sql = "INSERT INTO users (chat_id, username) VALUES (%s, %s)"
     val = (chat_id, name)
     mycursor.execute(sql, val)
+    mycursor.close()
     mydb.commit()
 
 def update_keys(apikey,apisecret,chat_id):
     sql = "UPDATE users set api_key = %s, api_secret = %s WHERE chat_id = %s"
     val = (apikey, apisecret, chat_id)
     mycursor.execute(sql, val)
+    mycursor.close()
     mydb.commit()
 
 def get_user_keys(chat_id):
@@ -65,9 +71,17 @@ def get_user_keys(chat_id):
     #val = chat_id
     mycursor.execute(sql)
     result = mycursor.fetchone()
+    mycursor.close()
     if result == None:
         return str('user not exists')
     else:
         return result
+
+def get_breadcumb(chat_id):
+    breadcumb = get_user_keys(str(chat_id))
+    bithumb = BithumbGlobalRestAPI(breadcumb[0],breadcumb[1])
+
+    return bithumb
+
 
 #def get_balance(chat_id):

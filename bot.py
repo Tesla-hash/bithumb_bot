@@ -19,8 +19,6 @@ import mysql.connector
 cwd = os.getcwd()
 
 user_list = []
-mycursor = mydb.cursor()
-
 
 @bot.message_handler(commands=['start', 'help'])
 @bot.message_handler(func=lambda message: message.text == 'Привет')
@@ -76,24 +74,34 @@ def deposit(message):
 
 @bot.message_handler(commands=['orders'])
 def get_orders(message):
-    chat_id = str(message.chat.id)
-    breadcumb = get_user_keys(chat_id)
-    bithumb = BithumbGlobalRestAPI(breadcumb[0],breadcumb[1])
-    #params = 'buy'
+    bithumb = get_breadcumb(message.chat.id)
     orders = bithumb.openning_orders('BIP/USDT')
     bot.send_message(message.chat.id,text=str(orders))
 
 
-@bot.message_handler(commands=['place_order'])
-def place_orders(message):
-    chat_id = str(message.chat.id)
-    breadcumb = get_user_keys(chat_id)
-    bithumb = BithumbGlobalRestAPI(breadcumb[0],breadcumb[1])
+@bot.message_handler(commands=['place'])
+def place_order(message):
+    bithumb = get_breadcumb(message.chat.id)
     bithumb.place_order('BIP/USDT','sell',0.01,700)
+    text = 'Ордер успешно размещен'
+    bot.send_message(message.chat.id,text=text)
 
+@bot.message_handler(commands=['cancel'])
+def cancel_order(message):
+    bithumb = get_breadcumb(message.chat.id)
+    bithumb.cancel_order('BIP/USDT','193328341685747712')
+    text = 'Ордер успешно отменен'
+    bot.send_message(message.chat.id,text=text)
 
+@bot.message_handler(commands=['single'])
+def get_single_order(message):
+    bithumb = get_breadcumb(message.chat.id)
+    print(bithumb.query_order('BIP/USDT','193328341685747712'))
 
-
+@bot.message_handler(commands=['get'])
+def orders(message):
+    bithumb = get_breadcumb(message.chat.id)
+    print(bithumb.orders('buy','BIP-USDT','trading'))
 
 
 
