@@ -68,10 +68,9 @@ def update_keys(apikey,apisecret,chat_id):
 
 def get_user_keys(chat_id):
     sql = "SELECT api_key, api_secret FROM users WHERE chat_id = "+chat_id
-    #val = chat_id
     mycursor.execute(sql)
     result = mycursor.fetchone()
-    mycursor.close()
+    #mycursor.close()
     if result == None:
         return str('user not exists')
     else:
